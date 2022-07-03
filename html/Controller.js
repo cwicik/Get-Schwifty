@@ -4,52 +4,76 @@ class Tile{
     }
 }
 
+function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+}
+
 class Board{
     constructor(size){
         this.size = size;
+        do {
+            this.generateBoard();
+            console.log(this.board);
+            console.log(this.validBoard());
+        }while(!this.validBoard() || this.solvedBoard());
+        console.log(this.board[0]);
+        console.log(this.board[1]);
+    }
+
+    generateBoard(){
+        const numbers = [...Array(this.size * this.size).keys()];
+        numbers.forEach(num => numbers[num]++);
+
         this.board = new Array();
 
-        for (let i = 0; i < size; i++) {
+        for (let y = 0; y < this.size; y++) {
             const row = new Array();
-            for (let j = 0; j < size; j++) {
-                row.push(new Tile(i * size + j + 1));
+            for (let x = 0; x < this.size; x++) {
+                const number = numbers[getRandomInt(numbers.length)];
+                row.push(new Tile(number));
+
+                const index = numbers.indexOf(number);
+                numbers.splice(index, 1);
             }
             this.board.push(row);
-        }
+        } 
     }
 
     validBoard(){
-        let seen = new Array();
-        // this.board = [
-        //     [6, NaN, 7],
-        //     [3, 2, 8],
-        //     [4, 5, 1]
-        // ];  
-        // this.size = 4;
-        // this.board = [
-        //     [1, 2, 3, 4],
-        //     [5, 6, 7, 8],
-        //     [9, 10, NaN, 15],
-        //     [13, 14, 12, 11]
-        // ];  
+        const seen = new Array(); 
         let count = 0;
-        for (let i = 0; i < this.size; i++) {
-            for (let j = 0; j < this.size; j++) {
-                let currentNum = this.board[i][j]; //.number
-                if ((this.size + 1 % 2)){
-                    if(!currentNum){
-                        count += j + 1;
+        for (let y = 0; y < this.size; y++) {
+            for (let x = 0; x < this.size; x++) {
+                const currentNum = this.board[y][x].number;
+                if(currentNum === this.size * this.size) {
+                    if ((this.size + 1) % 2) {
+                        count += y + 1;
                     }
                 }
-                if (currentNum){
+                else{
+                    seen.push(currentNum);
                     count += currentNum - seen.filter(num => num <= currentNum).length;
-                }       
+                }    
             }
         }
         return !Boolean(count % 2);
     }
+
+    solvedBoard(){
+        let lastNumber = null;
+        for (let y = 0; y < this.size; y++) {
+            for (let x = 0; x < this.size; x++) {
+                const currentNum = this.board[y][x].number;
+                if (lastNumber) {
+                    if (lastNumber + 1 !== currentNum) {
+                        return false;
+                    }
+                }
+                lastNumber = currentNum;
+            }
+        }
+        return true;
+    }
 }
 
-const board = new Board(4);
-console.log(board.board);
-console.log(board.validBoard());
+const board = new Board(2);
