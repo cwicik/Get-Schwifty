@@ -1,7 +1,8 @@
 class GameView{
     #board;
 
-    constructor() {
+    constructor(scoreboard) {
+        this.scoreboard = scoreboard;
         this.buttons = null;
     }    
 
@@ -30,20 +31,6 @@ class GameView{
         this.#resetLevelButton();
     }
 
-    #clearElement(element){
-        while (element.firstChild) {
-            element.removeChild(element.lastChild);
-        }
-    }
-
-    #createButton(x, y){
-        const button = document.createElement("button");
-        button.id = "gameButton";
-        button.innerHTML = this.#board.board[x][y].number === this.#board.emptyTile ? "&nbsp;" : this.#board.board[x][y].number;
-        button.addEventListener("click", () => this.onTileClick(x, y));
-        return button;
-    }
-
     updateBoard(){
         const boardSize = this.#board.size;
         for (let y = 0; y < boardSize; y++) {
@@ -67,14 +54,48 @@ class GameView{
     displayTimer(ticks){
         const timer = document.getElementById("timer");
         if (ticks) {
-            let seconds = ticks % 60; 
-            let minutes = Math.floor((ticks /  60)) % 60; 
-            let hours = Math.floor(((ticks /  60) / 60)) % 24;
-            seconds = seconds < 10 ? "0" + seconds : seconds;
-            minutes = minutes < 10 ? "0" + minutes : minutes;
-            hours = hours < 10 ? "0" + hours : hours;
-            timer.innerHTML = hours + ":" + minutes + ":" + seconds;
-        } 
+            timer.innerHTML = this.#parseTime(ticks);
+        }   
+    }
+
+    updateScoreboard(){
+        const scoreboardDiv = document.getElementById("scoreboard");
+        this.#clearElement(scoreboardDiv);
+
+        const title = document.createElement("div");
+        title.innerHTML = "Date | Username | Board | Best Time"
+        scoreboardDiv.appendChild(title);
+
+        this.scoreboard.scoreboard.forEach(user => {
+            const div = document.createElement("div");
+            div.innerHTML = user.startingTime.toLocaleDateString() + " | " + user.username +
+             " | " + user.boardSize + "X" + user.boardSize + " | " + this.#parseTime(user.score);
+            scoreboardDiv.appendChild(div);
+        });
+    }
+
+    #parseTime(ticks){
+        let seconds = ticks % 60; 
+        let minutes = Math.floor((ticks /  60)) % 60; 
+        let hours = Math.floor(((ticks /  60) / 60)) % 24;
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+        minutes = minutes < 10 ? "0" + minutes : minutes;
+        hours = hours < 10 ? "0" + hours : hours;
+        return hours + ":" + minutes + ":" + seconds;
+    }
+
+    #clearElement(element){
+        while (element.firstChild) {
+            element.removeChild(element.lastChild);
+        }
+    }
+
+    #createButton(x, y){
+        const button = document.createElement("button");
+        button.id = "gameButton";
+        button.innerHTML = this.#board.board[x][y].number === this.#board.emptyTile ? "&nbsp;" : this.#board.board[x][y].number;
+        button.addEventListener("click", () => this.onTileClick(x, y));
+        return button;
     }
 
     #displayWinMessage(){      
@@ -104,10 +125,18 @@ class GameView{
     }      
 }
 
-const gameView = new GameView();
+class ControllerBootstrapper{
+    createController(){
+        const scoreboard = new Scoreboard();
+        const gameView = new GameView(scoreboard);
 
-const boardFactory = new BoardFactory(gameView);
-const timer = new Timer(1000, gameView);
-const gameController = new GameController(boardFactory, gameView, timer);
+        const boardFactory = new BoardFactory(gameView);
+        const timer = new Timer(1000, gameView);
+        const username = prompt("Please enter your username");
+        return new GameController(boardFactory, gameView, timer, scoreboard, username);
+    }
+}
 
+const controllerBootstrapper = new ControllerBootstrapper();
+const gameController = controllerBootstrapper.createController();
 gameController.startGame();
