@@ -1,23 +1,23 @@
-class BoardDisplayer{
+class GameView{
+    #board;
+
     constructor() {
-        this.board = null;
         this.buttons = new Array();
     }    
 
-    setBoard(board){
-        this.board = board;
+    setGameController(gameController){
+        this.gameController = gameController;
+        this.#board = gameController.board;
     }
 
     displayBoard(){
         document.getElementById("winText").innerHTML = "";
 
-        for (let y = 0; y < this.board.size; y++) {
+        const boardSize = this.#board.size;
+        for (let y = 0; y < boardSize; y++) {
             const div = document.createElement("div");
-            for (let x = 0; x < this.board.size; x++) {
-                const button = document.createElement("button");
-                button.id = "gameButton";
-                button.innerHTML = this.board.board[x][y].number === this.board.emptyTile ? "&nbsp;" : this.board.board[x][y].number;
-                button.addEventListener("click", () => this.onClick(x, y));
+            for (let x = 0; x < boardSize; x++) {
+                const button = this.#createButton(x, y);
                 div.appendChild(button);      
                 this.buttons.push(button);   
             }
@@ -25,34 +25,42 @@ class BoardDisplayer{
         }
     }
 
+    #createButton(x, y){
+        const button = document.createElement("button");
+        button.id = "gameButton";
+        button.innerHTML = this.#board.board[x][y].number === this.#board.emptyTile ? "&nbsp;" : this.#board.board[x][y].number;
+        button.addEventListener("click", () => this.onTileClick(x, y));
+        return button;
+    }
+
     updateBoard(){
-        for (let y = 0; y < this.board.size; y++) {
-            for (let x = 0; x < this.board.size; x++) {
-                const button = this.buttons[y * this.board.size + x];
-                button.innerHTML = this.board.board[x][y].number === this.board.emptyTile ? "&nbsp;" : this.board.board[x][y].number; 
+        const boardSize = this.#board.size;
+        for (let y = 0; y < boardSize; y++) {
+            for (let x = 0; x < boardSize; x++) {
+                const button = this.buttons[y * boardSize + x];
+                button.innerHTML = this.#board.board[x][y].number === this.#board.emptyTile ? "&nbsp;" : this.#board.board[x][y].number; 
             }
         }
     }
 
-    onClick(x, y){
-        if (this.board.attemptSwitchTile(x, y)) {
-            if (this.board.isSolved()) {
-                this.wonGame();
-            }
-        }
+    onTileClick(x, y){
+        this.gameController.attemptSwitchTile(x, y);
     }
 
-    wonGame(){      
+    displayWinMessage(){      
         document.getElementById("winText").innerHTML = "Congratulations! You have won!";
+    }
+
+    disableButtons(){
         this.buttons.forEach(button => {
             button.disabled = true;
         });
     }
 }
 
-const boardDisplayer = new BoardDisplayer();
+const gameView = new GameView();
 
-const boardFactory = new BoardFactory(boardDisplayer);
-const gameOrchestrator = new GameOrchestrator(boardFactory, boardDisplayer);
+const boardFactory = new BoardFactory(gameView);
+const gameController = new GameController(boardFactory, gameView);
 
-gameOrchestrator.startGame();
+gameController.startGame();

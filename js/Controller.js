@@ -1,7 +1,3 @@
-function getRandomInt(max) {
-    return Math.floor(Math.random() * max);
-}
-
 class Tile{
     constructor(number){
         this.number = number;
@@ -28,7 +24,7 @@ class Board{
         for (let x = 0; x < this.size; x++) {
             const column = new Array();
             for (let y = 0; y < this.size; y++) {
-                const number = numbers[getRandomInt(numbers.length)];
+                const number = numbers[this.#getRandomInt(numbers.length)];
                 column.push(new Tile(number));
 
                 const index = numbers.indexOf(number);
@@ -78,34 +74,14 @@ class Board{
         return this.board[x][y].number === this.emptyTile;
     }
 
-    attemptSwitchTile(x, y){
-        if (x + 1 < this.size) {
-            if (this.isEmptyTile(x + 1, y)) {
-                return this.switchTiles(x,y, x+1,y);
-            }
-        }
-        if (x - 1 >= 0) {
-            if (this.isEmptyTile(x - 1, y)) {
-                return this.switchTiles(x,y, x-1,y);
-            }
-        }
-        if (y + 1 < this.size) {
-            if (this.isEmptyTile(x, y + 1)) {
-                return this.switchTiles(x,y, x,y+1);
-            }
-        }
-        if (y - 1 >= 0) {
-            if (this.isEmptyTile(x, y - 1)) {
-                return this.switchTiles(x,y, x,y-1);
-            }
-        }
-        return false;
-    }
-
     switchTiles(x1,y1, x2,y2){
             [this.board[x1][y1], this.board[x2][y2]] = [this.board[x2][y2], this.board[x1][y1]];
             this.boardDisplayer.updateBoard();
             return true;
+    }
+
+    #getRandomInt(max) {
+        return Math.floor(Math.random() * max);
     }
 }
 
@@ -125,16 +101,47 @@ class BoardFactory{
     }
 }
 
-class GameOrchestrator{
-    constructor(boardFacory, boardDisplayer) {
+class GameController{
+    constructor(boardFacory, gameView) {
         this.boardFacory = boardFacory;
-        this.boardDisplayer = boardDisplayer;
-        this.board = null;
+        this.gameView = gameView;
     }
 
     startGame(){
         this.board = boardFactory.createBoard();
-        this.boardDisplayer.setBoard(this.board);
-        boardDisplayer.displayBoard(this.board);
+        this.gameView.setGameController(this);
+        gameView.displayBoard(this.board);
+    }
+
+    attemptSwitchTile(x, y){
+        for (let shift = -1; shift < 2; shift+=2) {
+            if (this.#inBorder(x + shift)) {
+                if (this.board.isEmptyTile(x + shift, y)) {
+                    this.board.switchTiles(x,y, x+shift,y);
+                    this.checkWin();
+                    return;
+                }
+            }  
+
+            if (this.#inBorder(y + shift)) {
+                if (this.board.isEmptyTile(x, y + shift)) {
+                    this.board.switchTiles(x,y, x,y+shift);
+                    this.checkWin();
+                    return;
+                }
+            }
+        }
+    }
+
+    checkWin(){
+        if (this.board.isSolved()) {
+            this.gameView.disableButtons();
+            this.gameView.displayWinMessage();
+        }
+    }
+
+
+    #inBorder(index){
+        return index < this.board.size && index >= 0;
     }
 }
