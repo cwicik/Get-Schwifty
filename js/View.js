@@ -5,12 +5,13 @@ class BoardDisplayer{
 
     displayBoard(){
         const gameDiv = document.createElement("div");
-        gameDiv.className = "grid";
         document.body.appendChild(gameDiv);
 
         for (let y = 0; y < board.size; y++) {
+            const div = document.createElement("div");
             for (let x = 0; x < board.size; x++) {
                 const button = document.createElement("button");
+                button.id = "gameButton";
                 button.innerHTML = board.board[x][y].number === board.emptyTile ? "&nbsp;" : board.board[x][y].number;
                 button.addEventListener("click", () => {
                     board.attemptSwitchTile(x, y);
@@ -18,9 +19,10 @@ class BoardDisplayer{
                     board.isSolved() ? alert("won pog") : null;
                 }
                 );
-                gameDiv.appendChild(button);
+                div.appendChild(button);      
                 this.buttons.push(button);   
             }
+            gameDiv.appendChild(div);
         }
     }
 

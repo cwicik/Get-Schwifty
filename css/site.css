@@ -1,17 +1,13 @@
 body {
-    background-color: rgb(163, 203, 216);
     display: flex;
-    align-items: center;
+    background-color: lightcyan;
     justify-content: center;
-  }
-
-.grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    align-items: center;
 }
 
-div > button {
-    width: 2rem;
-    padding: 10px;
-    background-color: #ccc;
+#gameButton {
+    background-color: gainsboro;
+    width: 3rem;
+    height: 3rem;
+    font-size: large;
 }
