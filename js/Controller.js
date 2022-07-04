@@ -88,15 +88,16 @@ class Board{
 class BoardFactory{
     constructor(boardDisplayer) {
         this.boardDisplayer = boardDisplayer;
+        this.SMALLEST_BOARD_SIZE = 2;
     }
 
-    createBoard(boardSize = 0){
+    createBoard(boardSize){
         if (boardSize) {
             return new Board(boardSize, this.boardDisplayer);
         }
         do {
-            boardSize = Number.parseInt(prompt("Please enter board size", 3));
-        } while (!boardSize || boardSize < 2);
+            boardSize = Number.parseInt(prompt("Please enter board size (>=2)", this.SMALLEST_BOARD_SIZE));
+        } while (!boardSize || boardSize < this.SMALLEST_BOARD_SIZE);
         return new Board(boardSize, this.boardDisplayer);
     }
 }
@@ -107,8 +108,8 @@ class GameController{
         this.gameView = gameView;
     }
 
-    startGame(){
-        this.board = boardFactory.createBoard();
+    startGame(size = 0){
+        this.board = boardFactory.createBoard(size);
         this.gameView.setGameController(this);
         gameView.displayBoard(this.board);
     }
@@ -135,8 +136,7 @@ class GameController{
 
     checkWin(){
         if (this.board.isSolved()) {
-            this.gameView.disableButtons();
-            this.gameView.displayWinMessage();
+            this.gameView.winScreen();
         }
     }
 

@@ -2,7 +2,7 @@ class GameView{
     #board;
 
     constructor() {
-        this.buttons = new Array();
+        this.buttons = null;
     }    
 
     setGameController(gameController){
@@ -12,6 +12,9 @@ class GameView{
 
     displayBoard(){
         document.getElementById("winText").innerHTML = "";
+        const gameDiv = document.getElementById("gameDiv")
+        this.buttons = new Array();
+        this.#clearElement(gameDiv);
 
         const boardSize = this.#board.size;
         for (let y = 0; y < boardSize; y++) {
@@ -21,7 +24,15 @@ class GameView{
                 div.appendChild(button);      
                 this.buttons.push(button);   
             }
-            document.getElementById("gameDiv").appendChild(div);
+            gameDiv.appendChild(div);
+        }
+
+        this.#resetLevelButton();
+    }
+
+    #clearElement(element){
+        while (element.firstChild) {
+            element.removeChild(element.lastChild);
         }
     }
 
@@ -43,19 +54,41 @@ class GameView{
         }
     }
 
+    winScreen(){
+        this.#disableButtons();
+        this.#displayWinMessage();
+        this.#nextLevelButton();
+    }
+
     onTileClick(x, y){
         this.gameController.attemptSwitchTile(x, y);
     }
 
-    displayWinMessage(){      
+    #displayWinMessage(){      
         document.getElementById("winText").innerHTML = "Congratulations! You have won!";
     }
 
-    disableButtons(){
+    #disableButtons(){
         this.buttons.forEach(button => {
             button.disabled = true;
         });
     }
+
+    #resetLevelButton(){
+        const button = document.createElement("button");
+        button.id = "menuButton";
+        button.innerHTML = "Reset";
+        button.addEventListener("click", () => this.gameController.startGame(this.#board.size));
+        document.getElementById("gameDiv").appendChild(button);
+    }  
+
+    #nextLevelButton(){
+        const button = document.createElement("button");
+        button.id = "menuButton";
+        button.innerHTML = "Next";
+        button.addEventListener("click", () => this.gameController.startGame(this.#board.size + 1));
+        document.getElementById("gameDiv").appendChild(button);
+    }      
 }
 
 const gameView = new GameView();

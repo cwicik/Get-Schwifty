@@ -29,3 +29,9 @@ body {
     position: absolute;
     font-size: 1.5rem;
 }
+
+#menuButton{
+    margin-top: 1rem;
+    width: 3rem;
+    height: 1.2rem;
+}
