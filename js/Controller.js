@@ -1,18 +1,19 @@
+function getRandomInt(max) {
+    return Math.floor(Math.random() * max);
+}
+
 class Tile{
     constructor(number){
         this.number = number;
     }
 }
 
-function getRandomInt(max) {
-    return Math.floor(Math.random() * max);
-}
-
 class Board{
-    constructor(size){
+    constructor(size, boardDisplayer){
         this.size = size;
         this.emptyTile = size * size;
         this.board = null;
+        this.boardDisplayer = boardDisplayer;
         do {
             this.generateBoard();
         }while(!this.isValid() || this.isSolved());
@@ -73,8 +74,12 @@ class Board{
         return true;
     }
 
+    isEmptyTile(x,y){
+        return this.board[x][y].number === this.emptyTile;
+    }
+
     attemptSwitchTile(x, y){
-        if (x + 1 < board.size) {
+        if (x + 1 < this.size) {
             if (this.isEmptyTile(x + 1, y)) {
                 return this.switchTiles(x,y, x+1,y);
             }
@@ -84,7 +89,7 @@ class Board{
                 return this.switchTiles(x,y, x-1,y);
             }
         }
-        if (y + 1 < board.size) {
+        if (y + 1 < this.size) {
             if (this.isEmptyTile(x, y + 1)) {
                 return this.switchTiles(x,y, x,y+1);
             }
@@ -97,12 +102,39 @@ class Board{
         return false;
     }
 
-    isEmptyTile(x,y){
-        return this.board[x][y].number === this.emptyTile;
-    }
-
     switchTiles(x1,y1, x2,y2){
             [this.board[x1][y1], this.board[x2][y2]] = [this.board[x2][y2], this.board[x1][y1]];
+            this.boardDisplayer.updateBoard();
             return true;
+    }
+}
+
+class BoardFactory{
+    constructor(boardDisplayer) {
+        this.boardDisplayer = boardDisplayer;
+    }
+
+    createBoard(boardSize = 0){
+        if (boardSize) {
+            return new Board(boardSize, this.boardDisplayer);
+        }
+        do {
+            boardSize = Number.parseInt(prompt("Please enter board size", 3));
+        } while (!boardSize || boardSize < 2);
+        return new Board(boardSize, this.boardDisplayer);
+    }
+}
+
+class GameOrchestrator{
+    constructor(boardFacory, boardDisplayer) {
+        this.boardFacory = boardFacory;
+        this.boardDisplayer = boardDisplayer;
+        this.board = null;
+    }
+
+    startGame(){
+        this.board = boardFactory.createBoard();
+        this.boardDisplayer.setBoard(this.board);
+        boardDisplayer.displayBoard(this.board);
     }
 }
