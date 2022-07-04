@@ -37,7 +37,6 @@ class Board{
         } 
     }
 
-    //FIX ME
     isValid(){
         const seen = new Array(); 
         let count = 0;
@@ -45,7 +44,7 @@ class Board{
             for (let y = 0; y < this.size; y++) {
                 if(this.isEmptyTile(y,x)) {
                     if ((this.size + 1) % 2) {
-                        count += y + 1;
+                        count += x + 1;
                     }
                 }
                 else{

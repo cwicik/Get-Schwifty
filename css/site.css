@@ -9,5 +9,6 @@ body {
     background-color: gainsboro;
     width: 3rem;
     height: 3rem;
-    font-size: large;
+    font-size: x-large;
+    font-family: 'Times New Roman', Times, serif;
 }
