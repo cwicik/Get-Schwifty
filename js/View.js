@@ -4,8 +4,7 @@ class BoardDisplayer{
     }    
 
     displayBoard(){
-        const gameDiv = document.createElement("div");
-        document.body.appendChild(gameDiv);
+        document.getElementById("winText").innerHTML = "";
 
         for (let y = 0; y < board.size; y++) {
             const div = document.createElement("div");
@@ -13,16 +12,11 @@ class BoardDisplayer{
                 const button = document.createElement("button");
                 button.id = "gameButton";
                 button.innerHTML = board.board[x][y].number === board.emptyTile ? "&nbsp;" : board.board[x][y].number;
-                button.addEventListener("click", () => {
-                    board.attemptSwitchTile(x, y);
-                    this.updateBoard();
-                    board.isSolved() ? alert("won pog") : null;
-                }
-                );
+                button.addEventListener("click", () => this.onClick(x, y));
                 div.appendChild(button);      
                 this.buttons.push(button);   
             }
-            gameDiv.appendChild(div);
+            document.getElementById("gameDiv").appendChild(div);
         }
     }
 
@@ -33,6 +27,22 @@ class BoardDisplayer{
                 button.innerHTML = board.board[x][y].number === board.emptyTile ? "&nbsp;" : board.board[x][y].number; 
             }
         }
+    }
+
+    onClick(x, y){
+        if (board.attemptSwitchTile(x, y)) {
+            this.updateBoard();
+            if (board.isSolved()) {
+                this.wonGame();
+            }
+        }
+    }
+
+    wonGame(){      
+        document.getElementById("winText").innerHTML = "Congratulations! You have won!";
+        this.buttons.forEach(button => {
+            button.disabled = true;
+        });
     }
 }
 
