@@ -11,6 +11,7 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
 }
 
 #gameButton {
@@ -34,4 +35,8 @@ body {
     margin-top: 1rem;
     width: 3rem;
     height: 1.2rem;
+}
+
+#timer{
+    margin-top: 0.6rem;
 }

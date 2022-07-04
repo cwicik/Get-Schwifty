@@ -64,6 +64,19 @@ class GameView{
         this.gameController.attemptSwitchTile(x, y);
     }
 
+    displayTimer(ticks){
+        const timer = document.getElementById("timer");
+        if (ticks) {
+            let seconds = ticks % 60; 
+            let minutes = Math.floor((ticks /  60)) % 60; 
+            let hours = Math.floor(((ticks /  60) / 60)) % 24;
+            seconds = seconds < 10 ? "0" + seconds : seconds;
+            minutes = minutes < 10 ? "0" + minutes : minutes;
+            hours = hours < 10 ? "0" + hours : hours;
+            timer.innerHTML = hours + ":" + minutes + ":" + seconds;
+        } 
+    }
+
     #displayWinMessage(){      
         document.getElementById("winText").innerHTML = "Congratulations! You have won!";
     }
@@ -94,6 +107,7 @@ class GameView{
 const gameView = new GameView();
 
 const boardFactory = new BoardFactory(gameView);
-const gameController = new GameController(boardFactory, gameView);
+const timer = new Timer(1000, gameView);
+const gameController = new GameController(boardFactory, gameView, timer);
 
 gameController.startGame();

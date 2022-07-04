@@ -103,15 +103,20 @@ class BoardFactory{
 }
 
 class GameController{
-    constructor(boardFacory, gameView) {
+    constructor(boardFacory, gameView, timer) {
         this.boardFacory = boardFacory;
         this.gameView = gameView;
+        this.startTime = null;
+        this.timer = timer;
     }
 
     startGame(size = 0){
         this.board = boardFactory.createBoard(size);
         this.gameView.setGameController(this);
         gameView.displayBoard(this.board);
+        this.startTime = new Date();
+        this.timer.reset();
+        this.timer.start();
     }
 
     attemptSwitchTile(x, y){
@@ -136,6 +141,8 @@ class GameController{
 
     checkWin(){
         if (this.board.isSolved()) {
+            this.timer.stop();
+            //record time for scoreboard
             this.gameView.winScreen();
         }
     }
@@ -143,5 +150,36 @@ class GameController{
 
     #inBorder(index){
         return index < this.board.size && index >= 0;
+    }
+}
+
+class Timer{
+    constructor(interval, gameView) {
+        this.interval = interval;
+        this.gameView = gameView;
+        this.seconds = 0;
+        this.SECONDS_IN_DAY = 86400;
+    }
+
+    tick(){
+        this.seconds++;
+        if (this.seconds >= this.SECONDS_IN_DAY) {
+            this.seconds = this.SECONDS_IN_DAY - 1;
+            this.stop();
+        }
+        this.gameView.displayTimer(this.seconds);
+    }
+
+    start(){
+        this.timer = setInterval(() => this.tick(), this.interval);
+    }
+
+    stop(){
+        clearInterval(this.timer);
+    }
+
+    reset(){
+        this.seconds = 0;
+        this.gameView.displayTimer("");
     }
 }
