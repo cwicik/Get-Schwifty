@@ -1,0 +1,17 @@
+body {
+    background-color: rgb(163, 203, 216);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+}
+
+div > button {
+    width: 2rem;
+    padding: 10px;
+    background-color: #ccc;
+}

@@ -37,6 +37,7 @@ class Board{
         } 
     }
 
+    //FIX ME
     isValid(){
         const seen = new Array(); 
         let count = 0;
